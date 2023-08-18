@@ -1,0 +1,115 @@
+1 - Classe conta
+
+import java.util.Date;
+
+public abstract class Conta {
+    private String tipoConta;
+    private String tipoCliente;
+    private Date dataAbertura;
+    private double saldo;
+
+    public Conta(String tipoConta, String tipoCliente, Date dataAbertura, double saldo) {
+        this.tipoConta = tipoConta;
+        this.tipoCliente = tipoCliente;
+        this.dataAbertura = dataAbertura;
+        this.saldo = saldo;
+    }
+
+    public String getTipoConta() {
+        return tipoConta;
+    }
+
+    public String getTipoCliente() {
+        return tipoCliente;
+    }
+
+    public Date getDataAbertura() {
+        return dataAbertura;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void depositar(double valor) {
+        saldo += valor;
+        System.out.println("Depósito de " + valor + " na " + tipoConta);
+    }
+
+    public void sacar(double valor) {
+        if (valor <= saldo) {
+            saldo -= valor;
+            System.out.println("Saque de " + valor + " na " + tipoConta);
+        } else {
+            System.out.println("Saldo insuficiente na " + tipoConta);
+        }
+    }
+
+    public abstract double calcularValorTarifaManutencao();
+}
+
+
+
+2 - Classes das Contas Poupança e Investimento
+
+public class ContaPoupanca extends Conta {
+    public ContaPoupanca(String tipoCliente, Date dataAbertura, double saldo) {
+        super("Conta Poupança", tipoCliente, dataAbertura, saldo);
+    }
+
+
+    public double calcularValorTarifaManutencao() {
+        // Lógica para calcular a tarifa de manutenção da conta poupança
+        return 0.0; // Valor de tarifa de manutenção para conta poupança
+    }
+}
+
+public class ContaInvestimento extends Conta {
+    public ContaInvestimento(String tipoCliente, Date dataAbertura, double saldo) {
+        super("Conta Investimento", tipoCliente, dataAbertura, saldo);
+    }
+
+
+    public double calcularValorTarifaManutencao() {
+        // Lógica para calcular a tarifa de manutenção da conta de investimento
+        return 0.0; // Valor de tarifa de manutenção para conta de investimento
+    }
+}
+
+3 - Aspecto para verificação de saldo insuficiente:
+
+public aspect InsufficientBalanceAspect {
+    pointcut withdrawPointcut(Conta conta, double valor):
+        call(void Conta.sacar(double)) && target(conta) && args(valor);
+
+    before(Conta conta, double valor): withdrawPointcut(conta, valor) {
+        if (valor > conta.getSaldo()) {
+            System.out.println("Saldo insuficiente na " + conta.getTipoConta());
+        }
+    }
+}
+
+
+4 - Programa principal para testar o código:
+
+import java.util.Date;
+
+public class Main {
+    public static void main(String[] args) {
+        Date dataAbertura = new Date();
+
+        ContaPoupanca poupanca = new ContaPoupanca("Pessoa Física", dataAbertura, 1000);
+        ContaInvestimento investimento = new ContaInvestimento("Pessoa Jurídica", dataAbertura, 2000);
+
+        poupanca.sacar(800);
+        investimento.sacar(2500);
+    }
+}
+
+
+
+
+
+
+
+
